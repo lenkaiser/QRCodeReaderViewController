@@ -166,10 +166,11 @@
  * @param showSwitchCameraButton Flag to display the switch camera button.
  * @param showTorchButton Flag to know whether the view controller start
  * scanning the codes when the view will appear.
+ * @param showCancelButton Flag to display the cancel button
  * @see initWithCancelButtonTitle:codeReader:startScanningAtLoad:showSwitchCameraButton:showTorchButton:
  * @since 4.0.0
  */
-+ (nonnull instancetype)readerWithCancelButtonTitle:(nullable NSString *)cancelTitle codeReader:(nonnull QRCodeReader *)codeReader startScanningAtLoad:(BOOL)startScanningAtLoad showSwitchCameraButton:(BOOL)showSwitchCameraButton showTorchButton:(BOOL)showTorchButton;
++ (nonnull instancetype)readerWithCancelButtonTitle:(nullable NSString *)cancelTitle codeReader:(nonnull QRCodeReader *)codeReader startScanningAtLoad:(BOOL)startScanningAtLoad showSwitchCameraButton:(BOOL)showSwitchCameraButton showTorchButton:(BOOL)showTorchButton showCancelButton:(BOOL)showCancelButton;
 
 #pragma mark - Controlling the Reader
 /** @name Controlling the Reader */

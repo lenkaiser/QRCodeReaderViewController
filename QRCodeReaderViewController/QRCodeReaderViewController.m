@@ -38,6 +38,7 @@
 @property (assign, nonatomic) BOOL                 startScanningAtLoad;
 @property (assign, nonatomic) BOOL                 showSwitchCameraButton;
 @property (assign, nonatomic) BOOL                 showTorchButton;
+@property (assign, nonatomic) BOOL				   showCancelButton;
 
 @property (copy, nonatomic) void (^completionBlock) (NSString * __nullable);
 
@@ -84,7 +85,7 @@
   return [self initWithCancelButtonTitle:cancelTitle codeReader:codeReader startScanningAtLoad:startScanningAtLoad showSwitchCameraButton:YES showTorchButton:NO];
 }
 
-- (id)initWithCancelButtonTitle:(nullable NSString *)cancelTitle codeReader:(nonnull QRCodeReader *)codeReader startScanningAtLoad:(BOOL)startScanningAtLoad showSwitchCameraButton:(BOOL)showSwitchCameraButton showTorchButton:(BOOL)showTorchButton
+- (id)initWithCancelButtonTitle:(nullable NSString *)cancelTitle codeReader:(nonnull QRCodeReader *)codeReader startScanningAtLoad:(BOOL)startScanningAtLoad showSwitchCameraButton:(BOOL)showSwitchCameraButton showTorchButton:(BOOL)showTorchButton showCancelButton:(BOOL)showCancelButton;
 {
   if ((self = [super init])) {
     self.view.backgroundColor   = [UIColor blackColor];
@@ -92,9 +93,10 @@
     self.startScanningAtLoad    = startScanningAtLoad;
     self.showSwitchCameraButton = showSwitchCameraButton;
     self.showTorchButton        = showTorchButton;
+    self.showCancelButton       = showCancelButton;
 
     if (cancelTitle == nil) {
-      cancelTitle = NSLocalizedString(@"Cancel", @"Cancel");
+		[self.cancelButton removeFromSuperview];
     }
 
     [self setupUIComponentsWithCancelButtonTitle:cancelTitle];
@@ -104,7 +106,7 @@
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
 
-    __weak __typeof__(self) weakSelf = self;
+    __weak typeof(self) weakSelf = self;
 
     [codeReader setCompletionWithBlock:^(NSString *resultAsString) {
       if (weakSelf.completionBlock != nil) {
@@ -144,9 +146,9 @@
   return [[self alloc] initWithCancelButtonTitle:cancelTitle codeReader:codeReader startScanningAtLoad:startScanningAtLoad];
 }
 
-+ (instancetype)readerWithCancelButtonTitle:(NSString *)cancelTitle codeReader:(QRCodeReader *)codeReader startScanningAtLoad:(BOOL)startScanningAtLoad showSwitchCameraButton:(BOOL)showSwitchCameraButton showTorchButton:(BOOL)showTorchButton
++ (instancetype)readerWithCancelButtonTitle:(NSString *)cancelTitle codeReader:(QRCodeReader *)codeReader startScanningAtLoad:(BOOL)startScanningAtLoad showSwitchCameraButton:(BOOL)showSwitchCameraButton showTorchButton:(BOOL)showTorchButton showCancelButton:(BOOL)showCancelButton
 {
-  return [[self alloc] initWithCancelButtonTitle:cancelTitle codeReader:codeReader startScanningAtLoad:startScanningAtLoad showSwitchCameraButton:showSwitchCameraButton showTorchButton:showTorchButton];
+  return [[self alloc] initWithCancelButtonTitle:cancelTitle codeReader:codeReader startScanningAtLoad:startScanningAtLoad showSwitchCameraButton:showSwitchCameraButton showTorchButton:showTorchButton showCancelButton:showCancelButton];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -251,14 +253,19 @@
 
 - (void)setupAutoLayoutConstraints
 {
-  NSDictionary *views = NSDictionaryOfVariableBindings(_cameraView, _cancelButton);
-
-  [self.view addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_cameraView][_cancelButton(40)]|" options:0 metrics:nil views:views]];
-  [self.view addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_cameraView]|" options:0 metrics:nil views:views]];
-  [self.view addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[_cancelButton]-|" options:0 metrics:nil views:views]];
+	  NSDictionary *views = NSDictionaryOfVariableBindings(_cameraView, _cancelButton);
+	
+	if(_showCancelButton) {
+	  [self.view addConstraints:
+	   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_cameraView][_cancelButton(40)]|" options:0 metrics:nil views:views]];
+	} else {
+		[self.view addConstraints:
+		 [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_cameraView][_cancelButton(0)]|" options:0 metrics:nil views:views]];
+	}
+	  [self.view addConstraints:
+	   [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_cameraView]|" options:0 metrics:nil views:views]];
+	  [self.view addConstraints:
+	   [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[_cancelButton]-|" options:0 metrics:nil views:views]];
 
   id topLayoutGuide = self.topLayoutGuide;
   
